@@ -1,4 +1,6 @@
-# SegMamba
+# WaveFormer on BraTS
+
+----------- [ everything below this is cloned from SegMamba. we will update the code for our current work later  ] -----------
 
 **Now we have open-sourced the pre-processing, training, inference, and metrics computation codes.**
 

@@ -23,6 +23,8 @@ from torch.utils.data import Dataset
 import glob 
 from light_training.dataloading.utils import unpack_dataset
 import random 
+import pickle
+
 
 class MedicalDataset(Dataset):
     def __init__(self, datalist, test=False) -> None:
@@ -241,7 +243,7 @@ def get_train_val_test_loader_from_split_json(data_dir, split_json_file):
     return loader
 
 
-def get_train_val_test_loader_from_train(data_dir, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
+def get_train_val_test_loader_from_train(data_dir, save_path, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
     ## train all labeled data 
     ## fold denote the validation data in training data
     all_paths = glob.glob(f"{data_dir}/*.npz")
@@ -261,6 +263,12 @@ def get_train_val_test_loader_from_train(data_dir, train_rate=0.7, val_rate=0.1,
     print(f"training data is {len(train_datalist)}")
     print(f"validation data is {len(val_datalist)}")
     print(f"test data is {len(test_datalist)}", sorted(test_datalist))
+
+    with open(os.path.join(save_path,'test_list.pkl'), 'wb') as f:
+        pickle.dump(test_datalist, f)
+
+
+
 
     train_ds = MedicalDataset(train_datalist)
     val_ds = MedicalDataset(val_datalist)

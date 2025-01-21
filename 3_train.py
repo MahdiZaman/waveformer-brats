@@ -164,14 +164,14 @@ class BraTSTrainer(Trainer):
 
         if mean_dice > self.best_mean_dice:
             self.best_mean_dice = mean_dice
-            save_new_model_and_delete_last(self.model, 
+            save_new_model_and_delete_last(self.model, self.scheduler, self.optimizer, mean_dice,
                                             os.path.join(model_save_path, 
-                                            f"best_model_{mean_dice:.4f}.pt"), 
+                                            f"best_model_{mean_dice:.4f}.pth"), 
                                             delete_symbol="best_model")
 
-        save_new_model_and_delete_last(self.model, 
+        save_new_model_and_delete_last(self.model, self.scheduler, self.optimizer, mean_dice,
                                         os.path.join(model_save_path, 
-                                        f"final_model_{mean_dice:.4f}.pt"), 
+                                        f"final_model_{mean_dice:.4f}.pth"), 
                                         delete_symbol="final_model")
 
 
@@ -192,6 +192,6 @@ if __name__ == "__main__":
                             master_port=17759,
                             training_script=__file__)
 
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, model_save_path)
 
     trainer.train(train_dataset=train_ds, val_dataset=val_ds)

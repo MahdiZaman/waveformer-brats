@@ -266,6 +266,10 @@ def get_train_val_test_loader_from_train(data_dir, save_path, train_rate=0.7, va
 
     with open(os.path.join(save_path,'test_list.pkl'), 'wb') as f:
         pickle.dump(test_datalist, f)
+    with open(os.path.join(save_path,'train_list.pkl'), 'wb') as f:
+        pickle.dump(train_datalist, f)
+    with open(os.path.join(save_path,'val_list.pkl'), 'wb') as f:
+        pickle.dump(val_datalist, f)
 
 
 

@@ -18,6 +18,7 @@ import os
 
 data_dir = "../SegMamba/data/fullres/train"
 logdir = f"./logs/segmamba"
+data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
@@ -26,6 +27,10 @@ model_save_path = os.path.join(logdir, "model_upsample_inside")
 
 if not os.path.exists(model_save_path):
     os.makedirs(model_save_path)
+
+if not os.path.exists(data_list_path):
+    os.makedirs(data_list_path)
+
     
 # augmentation = "nomirror"
 augmentation = True
@@ -192,6 +197,6 @@ if __name__ == "__main__":
                             master_port=17759,
                             training_script=__file__)
 
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, model_save_path)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path)
 
     trainer.train(train_dataset=train_ds, val_dataset=val_ds)

@@ -16,7 +16,7 @@ import datetime
 import time
 import os
 
-data_dir = "./data/fullres/train"
+data_dir = "../SegMamba/data/fullres/train"
 logdir = f"./logs/segmamba"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')

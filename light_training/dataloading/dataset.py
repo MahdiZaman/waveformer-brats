@@ -243,7 +243,7 @@ def get_train_val_test_loader_from_split_json(data_dir, split_json_file):
     return loader
 
 
-def get_train_val_test_loader_from_train(data_dir, save_path, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
+def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
     ## train all labeled data 
     ## fold denote the validation data in training data
     all_paths = glob.glob(f"{data_dir}/*.npz")
@@ -263,13 +263,20 @@ def get_train_val_test_loader_from_train(data_dir, save_path, train_rate=0.7, va
     print(f"training data is {len(train_datalist)}")
     print(f"validation data is {len(val_datalist)}")
     print(f"test data is {len(test_datalist)}", sorted(test_datalist))
+    
+    if test:
+        test_file_list = os.path.join(save_path,'test_list.pkl')
+        if os.path.exists(test_file_list):
+            with open(test_file_list, "rb") as f:
+                test_datalist = pickle.load(f)
 
-    with open(os.path.join(save_path,'test_list.pkl'), 'wb') as f:
-        pickle.dump(test_datalist, f)
-    with open(os.path.join(save_path,'train_list.pkl'), 'wb') as f:
-        pickle.dump(train_datalist, f)
-    with open(os.path.join(save_path,'val_list.pkl'), 'wb') as f:
-        pickle.dump(val_datalist, f)
+    if not test:
+        with open(os.path.join(save_path,'test_list.pkl'), 'wb') as f:
+            pickle.dump(test_datalist, f)
+        with open(os.path.join(save_path,'train_list.pkl'), 'wb') as f:
+            pickle.dump(train_datalist, f)
+        with open(os.path.join(save_path,'val_list.pkl'), 'wb') as f:
+            pickle.dump(val_datalist, f)
 
 
 

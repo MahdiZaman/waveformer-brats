@@ -12,6 +12,7 @@ import os
 from light_training.prediction import Predictor
 
 data_dir = "./data/fullres/train"
+data_list_path = f"./data_list"
 env = "pytorch"
 max_epoch = 1000
 batch_size = 2
@@ -66,11 +67,9 @@ class BraTSTrainer(Trainer):
 
         return model, predictor, save_path
     
-    def validation_step(self, batch):
+    def validation_step(self, batch, model, predictor, save_path):
         image, label, properties = self.get_input(batch)
-        ddim = False
-      
-        model, predictor, save_path = self.define_model_segmamba()
+        ddim = False  
 
         model_output = predictor.maybe_mirror_and_predict(image, model, device=device)
 
@@ -130,7 +129,7 @@ if __name__ == "__main__":
                             master_port=17751,
                             training_script=__file__)
     
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, test=True)
 
     trainer.validation_single_gpu(test_ds)
 

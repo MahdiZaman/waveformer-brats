@@ -139,7 +139,7 @@ if __name__ == "__main__":
                             master_port=17751,
                             training_script=__file__)
     
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, test=True)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path)
 
     trainer.validation_single_gpu(test_ds)
 

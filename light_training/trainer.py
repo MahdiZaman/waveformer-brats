@@ -217,9 +217,10 @@ class Trainer:
             print(f"single gpu model not support the ddp")
             exit(0)
         val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, pin_memory=True)
-        if self.model is not None:
-            self.model.to(self.device)
-            self.model.eval()
+        model, predictor, save_path = self.define_model_segmamba()
+        # if model is not None:
+        #     model.to(self.device)
+        #     model.eval()
         val_outputs = []
         
         for idx, batch in tqdm(enumerate(val_loader), total=len(val_loader)):
@@ -227,7 +228,7 @@ class Trainer:
             batch = self.to_device(batch)
 
             with torch.no_grad():
-                val_out = self.validation_step(batch)
+                val_out = self.validation_step(batch, model, predictor, save_path)
                 assert val_out is not None 
 
             return_list = False
@@ -481,6 +482,9 @@ class Trainer:
     
     def validation_step(self, batch):
         raise NotImplementedError
+    
+    def define_model_segmamba(self):
+        raise NotImplementedError
 
     def validation_end(self, mean_val_outputs, val_outputs):
         pass 
@@ -507,4 +511,3 @@ class Trainer:
         self.model.load_state_dict(new_sd, strict=strict)
         
         print(f"model parameters are loaded successed.")
-

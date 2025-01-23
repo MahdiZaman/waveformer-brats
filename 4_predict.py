@@ -2,6 +2,7 @@ import numpy as np
 from light_training.dataloading.dataset import get_train_val_test_loader_from_train
 import torch 
 import torch.nn as nn 
+from msHead_3D.network_backbone import MSHEAD_ATTN
 from monai.inferers import SlidingWindowInferer
 from light_training.evaluation.metric import dice
 from light_training.trainer import Trainer
@@ -11,7 +12,9 @@ set_determinism(123)
 import os
 from light_training.prediction import Predictor
 
-data_dir = "./data/fullres/train"
+data_dir = "../SegMamba/data/fullres/train"
+logdir = f"./logs/segmamba"
+data_list_path = f"./data_list"
 env = "pytorch"
 max_epoch = 1000
 batch_size = 2
@@ -42,14 +45,23 @@ class BraTSTrainer(Trainer):
         return image, label, properties 
 
     def define_model_segmamba(self):
-        from model_segmamba.segmamba import SegMamba
-        model = SegMamba(in_chans=4,
-                        out_chans=4,
-                        depths=[2,2,2,2],
-                        feat_size=[48, 96, 192, 384])
+        # from model_segmamba.segmamba import SegMamba
+        out_classes = 4
+        model = MSHEAD_ATTN(
+            img_size=(128, 128, 128),
+            patch_size=2,
+            in_chans=4,
+            out_chans=out_classes,
+            depths=[2,2,2,2],
+            feat_size=[48,96,192,384],
+            num_heads = [3,6,12,24],
+            drop_path_rate=0.1,
+            use_checkpoint=False,
+        )
         
-        model_path = "/home/xingzhaohu/dev/jiuding_code/brats23/logs/segmamba/model/final_model_0.9038.pt"
-        new_sd = self.filte_state_dict(torch.load(model_path, map_location="cpu"))
+        model_path = "./logs/segmamba/model_upsample_inside/best_model_0.9357.pth"
+        model_dict = torch.load(model_path, map_location="cpu")
+        new_sd = self.filte_state_dict(model_dict['model'])
         model.load_state_dict(new_sd)
         model.eval()
         window_infer = SlidingWindowInferer(roi_size=patch_size,
@@ -66,11 +78,9 @@ class BraTSTrainer(Trainer):
 
         return model, predictor, save_path
     
-    def validation_step(self, batch):
+    def validation_step(self, batch, model, predictor, save_path):
         image, label, properties = self.get_input(batch)
-        ddim = False
-      
-        model, predictor, save_path = self.define_model_segmamba()
+        ddim = False  
 
         model_output = predictor.maybe_mirror_and_predict(image, model, device=device)
 
@@ -130,10 +140,9 @@ if __name__ == "__main__":
                             master_port=17751,
                             training_script=__file__)
     
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, test=True)
 
     trainer.validation_single_gpu(test_ds)
 
     # print(f"result is {v_mean}")
-
 

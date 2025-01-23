@@ -23,7 +23,7 @@ data_list_path = f"./data_list"
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
 
-model_save_path = os.path.join(logdir, "model_upsample_inside")
+model_save_path = os.path.join(logdir, "model_upsample_inside_wd_1e-5")
 
 if not os.path.exists(model_save_path):
     os.makedirs(model_save_path)

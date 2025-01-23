@@ -47,8 +47,9 @@ def convert_labels(labels):
 
 
 if __name__ == "__main__":
-    data_dir = "./data/fullres/train"
-    raw_data_dir = "./data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData/"
+    logdir = f"./logs/segmamba"
+    data_dir = "../../SegMamba/data/fullres/train"
+    raw_data_dir = "../../SegMamba/data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData/"
     train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir)
     print(len(test_ds))
     all_results = np.zeros((250,3,2))

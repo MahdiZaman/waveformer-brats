@@ -16,14 +16,14 @@ import datetime
 import time
 import os
 
-data_dir = "../SegMamba/data/fullres/train"
 logdir = f"./logs/segmamba"
+data_dir = "../../SegMamba/data/fullres/train"
 data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
 
-model_save_path = os.path.join(logdir, "model_upsample_inside")
+model_save_path = os.path.join(logdir, "model_idwt_inside_wd_1e-5")
 
 if not os.path.exists(model_save_path):
     os.makedirs(model_save_path)
@@ -181,7 +181,11 @@ class BraTSTrainer(Trainer):
 
 
         if (self.epoch + 1) % 100 == 0:
-            torch.save(self.model.state_dict(), os.path.join(model_save_path, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pt"))
+            save_state = {'model': self.model.state_dict(),
+                  'optimizer': self.optimizer.state_dict(),
+                  'lr_scheduler': self.scheduler.state_dict(),
+                  'dice_score': mean_dice}
+            torch.save(save_state, os.path.join(model_save_path, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pth"))
 
         print(f"mean_dice is {mean_dice}")
 

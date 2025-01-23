@@ -218,9 +218,9 @@ class Trainer:
             exit(0)
         val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, pin_memory=True)
         model, predictor, save_path = self.define_model_segmamba()
-        if model is not None:
-            model.to(self.device)
-            model.eval()
+        # if model is not None:
+        #     model.to(self.device)
+        #     model.eval()
         val_outputs = []
         
         for idx, batch in tqdm(enumerate(val_loader), total=len(val_loader)):
@@ -228,7 +228,7 @@ class Trainer:
             batch = self.to_device(batch)
 
             with torch.no_grad():
-                val_out = self.validation_step(batch)
+                val_out = self.validation_step(batch, model, predictor, save_path)
                 assert val_out is not None 
 
             return_list = False

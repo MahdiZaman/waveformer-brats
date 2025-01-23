@@ -121,7 +121,7 @@ class Predictor:
         x = x.to(device)
         with torch.no_grad():
             print(f"predicting....")
-            with torch.autocast("cuda", enabled=True) if device.type == "cuda" else dummy_context():
+            with torch.autocast("cuda", enabled=False) if device.type == "cuda" else dummy_context():
                 prediction = window_infer(x, model, **kwargs).cpu()
                 mirror_axes = self.mirror_axes
 

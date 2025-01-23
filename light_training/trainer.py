@@ -159,9 +159,9 @@ class Trainer:
                                               print_time=self.print_time)
         
         data_generator = LimitedLenWrapper(self.num_step_per_epoch, data_loader=train_loader, 
-                                           transform=tr_transforms,
-                                             num_processes=self.train_process, num_cached=6, seeds=None,
-                                             pin_memory=True, wait_time=0.02)
+                                            transform=tr_transforms,
+                                            num_processes=self.train_process, num_cached=6, seeds=None,
+                                            pin_memory=True, wait_time=0.02)
         if val_ds is None:
             val_data_generator = None 
         else :

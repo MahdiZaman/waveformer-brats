@@ -78,7 +78,7 @@ class BraTSTrainer(Trainer):
         self.ce = nn.CrossEntropyLoss() 
         self.mse = nn.MSELoss()
         self.train_process = 18
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=3e-5,
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
                                     momentum=0.99, nesterov=True)
         
         self.scheduler_type = "poly"
@@ -181,7 +181,11 @@ class BraTSTrainer(Trainer):
 
 
         if (self.epoch + 1) % 100 == 0:
-            torch.save(self.model.state_dict(), os.path.join(model_save_path, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pt"))
+            save_state = {'model': self.model.state_dict(),
+                  'optimizer': self.optimizer.state_dict(),
+                  'lr_scheduler': self.scheduler.state_dict(),
+                  'dice_score': mean_dice}
+            torch.save(save_state, os.path.join(model_save_path, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pth"))
 
         print(f"mean_dice is {mean_dice}")
 

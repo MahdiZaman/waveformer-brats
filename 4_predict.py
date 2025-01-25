@@ -59,7 +59,7 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
         
-        model_path = "./logs/segmamba/model_upsample_inside/best_model_0.9357.pth"
+        model_path = "./logs/segmamba/model_upsample_inside_wd_1e-5/best_model_0.9370.pth"
         model_dict = torch.load(model_path, map_location="cpu")
         new_sd = self.filte_state_dict(model_dict['model'])
         model.load_state_dict(new_sd)

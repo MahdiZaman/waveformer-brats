@@ -183,6 +183,7 @@ class Trainer:
                             action='store_true',
                             help="not call launch!")
         ds_args = parser.parse_args()
+        print(f'###### local rank: {os.environ.get("LOCAL_RANK", 0)} #######')
         self.local_rank = int(os.environ.get("LOCAL_RANK", 0))
 
         print(f"self.local_rank is {self.local_rank}")

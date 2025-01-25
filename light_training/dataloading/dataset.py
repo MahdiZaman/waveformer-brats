@@ -262,13 +262,15 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
 
     print(f"training data is {len(train_datalist)}")
     print(f"validation data is {len(val_datalist)}")
-    print(f"test data is {len(test_datalist)}", sorted(test_datalist))
+    print(f"test data is {len(test_datalist)}")
     
     if test:
         test_file_list = os.path.join(save_path,'test_list.pkl')
         if os.path.exists(test_file_list):
+            print(f'####### loading test dataset #######')
             with open(test_file_list, "rb") as f:
                 test_datalist = pickle.load(f)
+    print(f"test data is {len(test_datalist)}", sorted(test_datalist))
 
     if not test:
         with open(os.path.join(save_path,'test_list.pkl'), 'wb') as f:

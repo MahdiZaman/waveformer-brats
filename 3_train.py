@@ -23,10 +23,10 @@ data_list_path = f"./data_list"
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
 
-model_save_path = os.path.join(logdir, "model_upsample_inside_wd_1e-5")
+logdir = os.path.join(logdir, "model_upsample_inside_wd_1e-5_4_gpu")
 
-if not os.path.exists(model_save_path):
-    os.makedirs(model_save_path)
+if not os.path.exists(logdir):
+    os.makedirs(logdir)
 
 if not os.path.exists(data_list_path):
     os.makedirs(data_list_path)
@@ -170,12 +170,12 @@ class BraTSTrainer(Trainer):
         if mean_dice > self.best_mean_dice:
             self.best_mean_dice = mean_dice
             save_new_model_and_delete_last(self.model, self.scheduler, self.optimizer, mean_dice,
-                                            os.path.join(model_save_path, 
+                                            os.path.join(logdir, 
                                             f"best_model_{mean_dice:.4f}.pth"), 
                                             delete_symbol="best_model")
 
         save_new_model_and_delete_last(self.model, self.scheduler, self.optimizer, mean_dice,
-                                        os.path.join(model_save_path, 
+                                        os.path.join(logdir, 
                                         f"final_model_{mean_dice:.4f}.pth"), 
                                         delete_symbol="final_model")
 
@@ -185,7 +185,7 @@ class BraTSTrainer(Trainer):
                   'optimizer': self.optimizer.state_dict(),
                   'lr_scheduler': self.scheduler.state_dict(),
                   'dice_score': mean_dice}
-            torch.save(save_state, os.path.join(model_save_path, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pth"))
+            torch.save(save_state, os.path.join(logdir, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pth"))
 
         print(f"mean_dice is {mean_dice}")
 

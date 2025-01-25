@@ -59,8 +59,9 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
         
-        model_path = "./logs/segmamba/model_idwt_inside/best_model_0.9334.pt"
-        new_sd = self.filte_state_dict(torch.load(model_path, map_location="cpu"))
+        model_path = "./logs/segmamba/model_upsample_inside_wd_1e-5/best_model_0.9370.pth"
+        model_dict = torch.load(model_path, map_location="cpu")
+        new_sd = self.filte_state_dict(model_dict['model'])
         model.load_state_dict(new_sd)
         model.eval()
         window_infer = SlidingWindowInferer(roi_size=patch_size,

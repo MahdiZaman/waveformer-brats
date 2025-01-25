@@ -40,7 +40,7 @@ env = "DDP"
 max_epoch = 1000
 batch_size = 2
 val_every = 2
-num_gpus = 2
+num_gpus = 4
 device = "cuda:0"
 roi_size = [128, 128, 128]
 
@@ -77,7 +77,7 @@ class BraTSTrainer(Trainer):
         self.best_mean_dice = 0.0
         self.ce = nn.CrossEntropyLoss() 
         self.mse = nn.MSELoss()
-        self.train_process = 18
+        self.train_process = 12
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
                                     momentum=0.99, nesterov=True)
         

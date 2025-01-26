@@ -49,7 +49,7 @@ def convert_labels(labels):
 if __name__ == "__main__":
     data_dir = "../../SegMamba/data/fullres/train"
     logdir = f"./logs/segmamba"
-    data_list_path = f"./data_list"
+    data_list_path = f"./data_property"
     raw_data_dir = "../../SegMamba/data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData/"
     train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, test=True)
     print(len(test_ds))

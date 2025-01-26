@@ -14,7 +14,7 @@ from light_training.prediction import Predictor
 
 logdir = f"./logs/segmamba"
 data_dir = "../../SegMamba/data/fullres/train"
-data_list_path = f"./data_list"
+data_list_path = f"./data_property"
 env = "pytorch"
 max_epoch = 1000
 batch_size = 2

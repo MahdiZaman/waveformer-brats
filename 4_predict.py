@@ -59,7 +59,8 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
         
-        model_path = "./logs/segmamba/model_idwt_inside_wd_1e-5/best_model_0.9327.pth"
+        model_name = "model_idwt_inside_wd_1e-5"
+        model_path = f"./logs/segmamba/{model_name}/best_model_0.9327.pth"
         model_dict = torch.load(model_path, map_location="cpu")
         new_sd = self.filte_state_dict(model_dict['model'])
         model.load_state_dict(new_sd)
@@ -73,7 +74,7 @@ class BraTSTrainer(Trainer):
         predictor = Predictor(window_infer=window_infer,
                               mirror_axes=[0,1,2])
 
-        save_path = "./prediction_results/segmamba"
+        save_path = f"./prediction_results/segmamba/{model_name}"
         os.makedirs(save_path, exist_ok=True)
 
         return model, predictor, save_path

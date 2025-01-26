@@ -18,7 +18,7 @@ parser.add_argument("--pred_name", required=True, type=str)
 
 results_root = "prediction_results"
 args = parser.parse_args()
-
+model_name = "model_idwt_inside_wd_1e-5"
 pred_name = args.pred_name
 
 def cal_metric(gt, pred, voxel_spacing):
@@ -47,11 +47,11 @@ def convert_labels(labels):
 
 
 if __name__ == "__main__":
-    logdir = f"./logs/segmamba"
     data_dir = "../../SegMamba/data/fullres/train"
+    logdir = f"./logs/segmamba"
     data_list_path = f"./data_list"
     raw_data_dir = "../../SegMamba/data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData/"
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, test=True)
     print(len(test_ds))
     all_results = np.zeros((250,3,2))
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         gt_array = sitk.GetArrayFromImage(gt_itk).astype(np.int32)
         gt_array = torch.from_numpy(gt_array)
         gt_array = convert_labels(gt_array).numpy()
-        pred_itk = sitk.ReadImage(f"./{results_root}/{pred_name}/{case_name}.nii.gz")
+        pred_itk = sitk.ReadImage(f"./{results_root}/{pred_name}/{model_name}/{case_name}.nii.gz")
         pred_array = sitk.GetArrayFromImage(pred_itk)
 
         m = each_cases_metric(gt_array, pred_array, voxel_spacing)
@@ -74,13 +74,11 @@ if __name__ == "__main__":
     
         ind += 1
 
-    os.makedirs(f"./{results_root}/result_metrics/", exist_ok=True)
-    np.save(f"./{results_root}/result_metrics/{pred_name}.npy", all_results) 
+    os.makedirs(f"./{results_root}/result_metrics/{model_name}", exist_ok=True)
+    np.save(f"./{results_root}/result_metrics/{model_name}/{pred_name}.npy", all_results) 
     
-    result = np.load(f"./{results_root}/result_metrics/{pred_name}.npy")
+    result = np.load(f"./{results_root}/result_metrics/{model_name}/{pred_name}.npy")
     print(result.shape)
     print(result.mean(axis=0))
     print(result.std(axis=0))
-
-
 

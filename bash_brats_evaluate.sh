@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=eval_brats_idwt_dec_wd_1e-5
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_idwt_dec_wd_1e-5.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_idwt_dec_wd_1e-5.%J.err
+#SBATCH --job-name=eval_brats_idwt_dec_wd_1e-5_4gpu
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_idwt_dec_wd_1e-5_4gpu.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_idwt_dec_wd_1e-5_4gpu.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16

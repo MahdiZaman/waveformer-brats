@@ -18,7 +18,7 @@ parser.add_argument("--pred_name", required=True, type=str)
 
 results_root = "prediction_results"
 args = parser.parse_args()
-model_name = "model_upsample_inside_wd_1e-5"
+model_name = "model_upsample_inside_wd_1e-5_4_gpu"
 pred_name = args.pred_name
 
 def cal_metric(gt, pred, voxel_spacing):

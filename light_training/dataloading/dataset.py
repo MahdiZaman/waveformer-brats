@@ -264,8 +264,6 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
     for path in all_paths:
         name = path[path.rindex('/')+1:]        # taking file name with extension
         name = name[:name.rindex('.')]          # removing extension
-        print(name)
-        exit()
         if name in test_files:
             test_datalist.append(path)
         else:

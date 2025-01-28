@@ -23,7 +23,8 @@ data_list_path = f"./data_list"
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
 
-logdir = os.path.join(logdir, "model_upsample_inside_wd_1e-5_4_gpu")
+# logdir = os.path.join(logdir, "model_upsample_inside_wd_1e-5_4_gpu")
+logdir = os.path.join(logdir, "dummy")
 
 if not os.path.exists(logdir):
     os.makedirs(logdir)

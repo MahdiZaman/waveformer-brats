@@ -41,7 +41,7 @@ env = "DDP"
 max_epoch = 1000
 batch_size = 2
 val_every = 2
-num_gpus = 4
+num_gpus = 2
 device = "cuda:0"
 roi_size = [128, 128, 128]
 
@@ -209,7 +209,7 @@ if __name__ == "__main__":
                             logdir=logdir,
                             val_every=val_every,
                             num_gpus=num_gpus,
-                            train_process=6,
+                            train_process=2,
                             master_port=17759,
                             training_script=__file__)
 

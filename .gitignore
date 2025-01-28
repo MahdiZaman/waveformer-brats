@@ -17,6 +17,7 @@ data/*
 pretrained/*
 output/*
 logs/*
+backup/*
 
 
 =======

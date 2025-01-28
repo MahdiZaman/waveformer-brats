@@ -256,29 +256,32 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
     all_paths = glob.glob(f"{data_dir}/*.npz")
     # fold_data = get_kfold_data(all_paths, 5)[fold]
 
-    train_number = int(len(all_paths) * train_rate)
-    val_number = int(len(all_paths) * val_rate)
-    test_number = int(len(all_paths) * test_rate)
+    test_file_names = os.path.join(save_path,'test_list.pkl')
+    test_datalist = []
+    rest_paths = []
+    with open(test_file_names, "rb") as f:
+        test_files = pickle.load(f)
+    for path in all_paths:
+        name = path[path.rindex('/')+1:]
+        if name in test_files:
+            test_datalist.append(path)
+        else:
+            rest_paths.append(path)
+    
+    print(f'test datalist:{len(test_datalist)} rest:{len(rest_paths)}')
+
     random.seed(seed)
     # random_state = random.random
-    random.shuffle(all_paths)
-
-    train_datalist = all_paths[:train_number]
-    val_datalist = all_paths[train_number: train_number + val_number]
-    test_datalist = all_paths[-test_number:] 
+    random.shuffle(rest_paths)
+    
+    train_number = 875
+    train_datalist = rest_paths[:train_number]
+    val_datalist = rest_paths[train_number:]
 
     print(f"training data is {len(train_datalist)}")
     print(f"validation data is {len(val_datalist)}")
     print(f"test data is {len(test_datalist)}")
     
-    if test:
-        test_file_list = os.path.join(save_path,'test_list.pkl')
-        if os.path.exists(test_file_list):
-            print(f'####### loading test dataset #######')
-            with open(test_file_list, "rb") as f:
-                test_datalist = pickle.load(f)
-    print(f"test data is {len(test_datalist)}", sorted(test_datalist))
-
     if not test:
         save_data_list(train_datalist, save_path, 'train_list')
         save_data_list(val_datalist, save_path, 'val_list')

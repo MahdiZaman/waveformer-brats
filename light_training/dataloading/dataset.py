@@ -255,7 +255,7 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
     ## fold denote the validation data in training data
     all_paths = glob.glob(f"{data_dir}/*.npz")
     # fold_data = get_kfold_data(all_paths, 5)[fold]
-
+    print(f'all paths: {len(all_paths)}')
     test_file_names = os.path.join(save_path,'test_list.pkl')
     test_datalist = []
     rest_paths = []
@@ -270,7 +270,7 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
             rest_paths.append(path)
     
     print(f'test datalist:{len(test_datalist)} rest:{len(rest_paths)}')
-    print(f'test list: {sorted(test_datalist)}')
+    # print(f'test list: {sorted(test_datalist)}')
 
     random.seed(seed)
     # random_state = random.random
@@ -283,7 +283,7 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
     print(f"training data is {len(train_datalist)}")
     print(f"validation data is {len(val_datalist)}")
     print(f"test data is {len(test_datalist)}")
-    
+    exit()
     if not test:
         save_data_list(train_datalist, save_path, 'train_list')
         save_data_list(val_datalist, save_path, 'val_list')

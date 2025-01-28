@@ -87,8 +87,8 @@ class BraTSTrainer(Trainer):
 
     def training_step(self, batch):
         image, label = self.get_input(batch)
-        # print(f'########### image:{image.shape} label:{label.shape} ###################')
-        # print(f'########### type image:{image.dtype} label:{label.dtype} ###################')
+        print(f'########### in training step image:{image.shape} label:{label.shape} ###################')
+        print(f'########### type image:{image.dtype} label:{label.dtype} ###################')
         pred = self.model(image)
 
         loss = self.cross(pred, label)
@@ -107,7 +107,8 @@ class BraTSTrainer(Trainer):
     def get_input(self, batch):
         image = batch["data"]
         label = batch["seg"]
-        # print(f'########### type image:{image.dtype} label:{label.dtype} ###################')
+        print(f'########### type image:{image.dtype} label:{label.dtype} ###################')
+        print(f'########### reading data image:{image.shape} label:{label.shape} ###################')
         # label = label[:, 0]
     
         label = label[:, 0].long()

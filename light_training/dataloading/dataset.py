@@ -242,6 +242,13 @@ def get_train_val_test_loader_from_split_json(data_dir, split_json_file):
 
     return loader
 
+def save_data_list(data_list, path, file_name):
+    file_path = os.path.join(path, file_name+'.pkl')
+    if not os.path.exists(file_path):
+        with open(file_path, 'wb') as f:
+            print(f'### Saving {file_name} ##')
+            pickle.dump(data_list, f)
+
 
 def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
     ## train all labeled data 
@@ -273,15 +280,9 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
     print(f"test data is {len(test_datalist)}", sorted(test_datalist))
 
     if not test:
-        with open(os.path.join(save_path,'test_list.pkl'), 'wb') as f:
-            pickle.dump(test_datalist, f)
-        with open(os.path.join(save_path,'train_list.pkl'), 'wb') as f:
-            pickle.dump(train_datalist, f)
-        with open(os.path.join(save_path,'val_list.pkl'), 'wb') as f:
-            pickle.dump(val_datalist, f)
-
-
-
+        save_data_list(train_datalist, save_path, 'train_list')
+        save_data_list(val_datalist, save_path, 'val_list')
+        save_data_list(test_datalist, save_path, 'test_list')
 
     train_ds = MedicalDataset(train_datalist)
     val_ds = MedicalDataset(val_datalist)

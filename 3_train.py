@@ -89,7 +89,8 @@ class BraTSTrainer(Trainer):
     def training_step(self, batch):
         image, label = self.get_input(batch)
         print(f'########### in training step image:{image.shape} label:{label.shape} ###################')
-        print(f'########### type image:{image.dtype} label:{label.dtype} ###################')
+        unique_values = torch.unique(label)
+        print(f'in trainng unique values: {unique_values}')
         pred = self.model(image)
 
         loss = self.cross(pred, label)
@@ -108,8 +109,9 @@ class BraTSTrainer(Trainer):
     def get_input(self, batch):
         image = batch["data"]
         label = batch["seg"]
-        print(f'########### type image:{image.dtype} label:{label.dtype} ###################')
         print(f'########### reading data image:{image.shape} label:{label.shape} ###################')
+        unique_values = torch.unique(label)
+        print(f'unique values: {unique_values}')
         # label = label[:, 0]
     
         label = label[:, 0].long()
@@ -200,7 +202,7 @@ if __name__ == "__main__":
                             logdir=logdir,
                             val_every=val_every,
                             num_gpus=num_gpus,
-                            train_process=12,
+                            train_process=2,
                             master_port=17759,
                             training_script=__file__)
 

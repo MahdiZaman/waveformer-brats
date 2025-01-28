@@ -41,7 +41,7 @@ env = "DDP"
 max_epoch = 1000
 batch_size = 2
 val_every = 2
-num_gpus = 2
+num_gpus = 4
 device = "cuda:0"
 roi_size = [128, 128, 128]
 

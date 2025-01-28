@@ -89,9 +89,10 @@ class BraTSTrainer(Trainer):
     def training_step(self, batch):
         image, label = self.get_input(batch)
         print(f'########### in training step image:{image.shape} label:{label.shape} ###################')
-        unique_values = torch.unique(label)
-        print(f'in trainng unique values: {unique_values}')
+        # unique_values = torch.unique(label)
+        # print(f'in trainng unique values: {unique_values}')
         pred = self.model(image)
+        print(f'pred:{pred.shape}')
 
         loss = self.dice_loss(pred, label)
         # print(f' ------------- loss:{loss} global step:{self.global_step} ------------- ')
@@ -109,12 +110,12 @@ class BraTSTrainer(Trainer):
     def get_input(self, batch):
         image = batch["data"]
         label = batch["seg"]
-        print(f'########### reading data image:{image.shape} label:{label.shape} ###################')
-        unique_values = torch.unique(label)
-        print(f'unique values: {unique_values}')
+        # print(f'########### reading data image:{image.shape} label:{label.shape} ###################')
+        # unique_values = torch.unique(label)
+        # print(f'unique values: {unique_values}')
         # label = label[:, 0]
     
-        label = label[:, 0].long()
+        # label = label[:, 0].long()
         return image, label
 
     def cal_metric(self, gt, pred, voxel_spacing=[1.0, 1.0, 1.0]):

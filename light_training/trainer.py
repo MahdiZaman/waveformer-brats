@@ -428,7 +428,8 @@ class Trainer:
                     ):
         if self.model is not None:
             self.model.train()
-        print(f'Scheduler:{self.scheduler}')
+        print(f'Scheduler:{self.scheduler}\n')
+        print(f'optimizer:{self.optimizer}\n')
         if self.local_rank==0:
             print(f'Epoch: {epoch} Training')
             s = time.time()

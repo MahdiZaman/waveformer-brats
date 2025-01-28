@@ -24,7 +24,7 @@ data_list_path = f"./data_list"
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
 
 # logdir = os.path.join(logdir, "model_upsample_inside_wd_1e-5_4_gpu")
-logdir = os.path.join(logdir, "dummy")
+logdir = os.path.join(logdir, "model_loss_dice_opt_adamw")
 
 if not os.path.exists(logdir):
     os.makedirs(logdir)

@@ -10,17 +10,21 @@ def delete_last_model(model_dir, symbol):
         os.remove(last_model[0])
 
 
-def save_new_model_and_delete_last(model, scheduler, optimizer, dice_score, save_path, delete_symbol=None):
+def save_new_model_and_delete_last(model, optimizer, dice_score, save_path, scheduler = None, delete_symbol=None):
     save_dir = os.path.dirname(save_path)
 
     os.makedirs(save_dir, exist_ok=True)
     if delete_last_model is not None:
         delete_last_model(save_dir, delete_symbol)
-    
-    save_state = {'model': model.state_dict(),
-                  'optimizer': optimizer.state_dict(),
-                  'lr_scheduler': scheduler.state_dict(),
-                  'dice_score': dice_score}
+    if scheduler is not None:
+        save_state = {'model': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'lr_scheduler': scheduler.state_dict(),
+                    'dice_score': dice_score}
+    else:
+        save_state = {'model': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'dice_score': dice_score}
     torch.save(save_state, save_path)
 
     print(f"model is saved in {save_path}")

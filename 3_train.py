@@ -79,10 +79,11 @@ class BraTSTrainer(Trainer):
         self.ce = nn.CrossEntropyLoss() 
         self.mse = nn.MSELoss()
         self.train_process = train_process
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
-                                    momentum=0.99, nesterov=True)
+        # self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
+        #                             momentum=0.99, nesterov=True)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.0001)
         
-        self.scheduler_type = "poly"
+        self.scheduler_type = "None"
         self.cross = nn.CrossEntropyLoss()
         self.dice_loss = DiceCELoss(to_onehot_y=True, softmax=True)
 
@@ -134,16 +135,12 @@ class BraTSTrainer(Trainer):
        
         output = self.model(image)
         output = output.argmax(dim=1)
-        print(f'output:{output.shape}')
         
         output = output[:, None]
         output = self.convert_labels(output)
-        print(f'output converted:{output.shape}')
 
         # label = label[:, None]
-        print(f'label:{label.shape}')
         label = self.convert_labels(label)
-        print(f'label converted:{label.shape}')
         output = output.cpu().numpy()
         target = label.cpu().numpy()
         
@@ -177,22 +174,28 @@ class BraTSTrainer(Trainer):
 
         if mean_dice > self.best_mean_dice:
             self.best_mean_dice = mean_dice
-            save_new_model_and_delete_last(self.model, self.scheduler, self.optimizer, mean_dice,
+            save_new_model_and_delete_last(self.model, self.optimizer, mean_dice,
                                             os.path.join(logdir, 
                                             f"best_model_{mean_dice:.4f}.pth"), 
                                             delete_symbol="best_model")
 
-        save_new_model_and_delete_last(self.model, self.scheduler, self.optimizer, mean_dice,
+        save_new_model_and_delete_last(self.model, self.optimizer, mean_dice,
                                         os.path.join(logdir, 
                                         f"final_model_{mean_dice:.4f}.pth"), 
                                         delete_symbol="final_model")
 
 
         if (self.epoch + 1) % 100 == 0:
-            save_state = {'model': self.model.state_dict(),
-                  'optimizer': self.optimizer.state_dict(),
-                  'lr_scheduler': self.scheduler.state_dict(),
-                  'dice_score': mean_dice}
+            if self.scheduler is not None:
+                save_state = {'model': self.model.state_dict(),
+                    'optimizer': self.optimizer.state_dict(),
+                    'lr_scheduler':self.scheduler.state_dict(),
+                    'dice_score': mean_dice}
+            else:
+                save_state = {'model': self.model.state_dict(),
+                    'optimizer': self.optimizer.state_dict(),
+                    'dice_score': mean_dice}
+
             torch.save(save_state, os.path.join(logdir, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pth"))
 
         print(f"mean_dice is {mean_dice}")

@@ -263,6 +263,8 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
         test_files = pickle.load(f)
     for path in all_paths:
         name = path[path.rindex('/')+1:]
+        print(name)
+        exit()
         if name in test_files:
             test_datalist.append(path)
         else:

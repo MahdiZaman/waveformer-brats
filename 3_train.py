@@ -88,11 +88,11 @@ class BraTSTrainer(Trainer):
 
     def training_step(self, batch):
         image, label = self.get_input(batch)
-        print(f'########### in training step image:{image.shape} label:{label.shape} ###################')
+        # print(f'########### in training step image:{image.shape} label:{label.shape} ###################')
         # unique_values = torch.unique(label)
         # print(f'in trainng unique values: {unique_values}')
         pred = self.model(image)
-        print(f'pred:{pred.shape}')
+        # print(f'pred:{pred.shape}')
 
         loss = self.dice_loss(pred, label)
         # print(f' ------------- loss:{loss} global step:{self.global_step} ------------- ')
@@ -134,13 +134,16 @@ class BraTSTrainer(Trainer):
        
         output = self.model(image)
         output = output.argmax(dim=1)
+        print(f'output:{output.shape}')
         
         output = output[:, None]
         output = self.convert_labels(output)
+        print(f'output converted:{output.shape}')
 
-        label = label[:, None]
+        # label = label[:, None]
+        print(f'label:{label.shape}')
         label = self.convert_labels(label)
-
+        print(f'label converted:{label.shape}')
         output = output.cpu().numpy()
         target = label.cpu().numpy()
         
@@ -203,7 +206,7 @@ if __name__ == "__main__":
                             logdir=logdir,
                             val_every=val_every,
                             num_gpus=num_gpus,
-                            train_process=2,
+                            train_process=6,
                             master_port=17759,
                             training_script=__file__)
 

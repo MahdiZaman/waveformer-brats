@@ -84,7 +84,7 @@ class BraTSTrainer(Trainer):
         
         self.scheduler_type = "poly"
         self.cross = nn.CrossEntropyLoss()
-        self.loss = DiceCELoss(to_onehot_y=True, softmax=True)
+        self.dice_loss = DiceCELoss(to_onehot_y=True, softmax=True)
 
     def training_step(self, batch):
         image, label = self.get_input(batch)
@@ -93,7 +93,7 @@ class BraTSTrainer(Trainer):
         print(f'in trainng unique values: {unique_values}')
         pred = self.model(image)
 
-        loss = self.cross(pred, label)
+        loss = self.dice_loss(pred, label)
         # print(f' ------------- loss:{loss} global step:{self.global_step} ------------- ')
         self.log("training_loss", loss, step=self.global_step)
 

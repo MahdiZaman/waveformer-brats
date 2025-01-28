@@ -270,7 +270,8 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
             rest_paths.append(path)
     
     print(f'test datalist:{len(test_datalist)} rest:{len(rest_paths)}')
-    # print(f'test list: {sorted(test_datalist)}')
+    print(f'test list: {sorted(test_datalist)}')
+    exit()
 
     random.seed(seed)
     # random_state = random.random

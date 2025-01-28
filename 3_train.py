@@ -16,15 +16,16 @@ import datetime
 import time
 import os
 
-data_dir = "../SegMamba/data/fullres/train"
+data_dir = "./data/fullres/train"
 logdir = f"./logs/segmamba"
+model_name = "model_loss_dice_opt_adamw"
 data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
 # print(f'$$$$$$$$$$$$$ run_id:{run_id} $$$$$$$$$$$$$')
 
 # logdir = os.path.join(logdir, "model_upsample_inside_wd_1e-5_4_gpu")
-logdir = os.path.join(logdir, "model_loss_dice_opt_adamw")
+logdir = os.path.join(logdir, model_name)
 
 if not os.path.exists(logdir):
     os.makedirs(logdir)
@@ -213,6 +214,6 @@ if __name__ == "__main__":
                             master_port=17759,
                             training_script=__file__)
 
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, model_name)
 
     trainer.train(train_dataset=train_ds, val_dataset=val_ds)

@@ -250,7 +250,7 @@ def save_data_list(data_list, path, file_name):
             pickle.dump(data_list, f)
 
 
-def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
+def get_train_val_test_loader_from_train(data_dir, save_path, model_name, test=False, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
     ## train all labeled data 
     ## fold denote the validation data in training data
     all_paths = glob.glob(f"{data_dir}/*.npz")
@@ -269,26 +269,32 @@ def get_train_val_test_loader_from_train(data_dir, save_path, test=False, train_
         else:
             rest_paths.append(path)
     
-    print(f'test datalist:{len(test_datalist)} rest:{len(rest_paths)}')
-    print(f'test list: {sorted(test_datalist)}')
-    exit()
-
-    random.seed(seed)
-    # random_state = random.random
-    random.shuffle(rest_paths)
-    
-    train_number = 875
-    train_datalist = rest_paths[:train_number]
-    val_datalist = rest_paths[train_number:]
+    existing_paths = os.path.join(save_path, model_name)
+    if os.path.exists(existing_paths):
+        file_path = os.path.join(existing_paths, 'train_list.pkl')
+        with open(file_path, "rb") as f:
+            train_datalist = pickle.load(f)
+        
+        file_path = os.path.join(existing_paths, 'val_list.pkl')
+        with open(file_path, "rb") as f:
+            val_datalist = pickle.load(f)
+    else:
+        random.seed(seed)
+        # random_state = random.random
+        random.shuffle(rest_paths)
+        train_number = 875
+        train_datalist = rest_paths[:train_number]
+        val_datalist = rest_paths[train_number:]
+        # exit()
+        if not test:
+            os.makedirs(existing_paths)
+            save_data_list(train_datalist, existing_paths, 'train_list')
+            save_data_list(val_datalist, existing_paths, 'val_list')
+            # save_data_list(test_datalist, save_path, 'test_list')
 
     print(f"training data is {len(train_datalist)}")
     print(f"validation data is {len(val_datalist)}")
     print(f"test data is {len(test_datalist)}")
-    exit()
-    if not test:
-        save_data_list(train_datalist, save_path, 'train_list')
-        save_data_list(val_datalist, save_path, 'val_list')
-        save_data_list(test_datalist, save_path, 'test_list')
 
     train_ds = MedicalDataset(train_datalist)
     val_ds = MedicalDataset(val_datalist)

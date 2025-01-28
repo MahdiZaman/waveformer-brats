@@ -285,7 +285,6 @@ def get_train_val_test_loader_from_train(data_dir, save_path, model_name, test=F
         train_number = 875
         train_datalist = rest_paths[:train_number]
         val_datalist = rest_paths[train_number:]
-        # exit()
         if not test:
             os.makedirs(existing_paths)
             save_data_list(train_datalist, existing_paths, 'train_list')

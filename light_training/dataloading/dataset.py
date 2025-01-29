@@ -271,6 +271,7 @@ def get_train_val_test_loader_from_train(data_dir, save_path, model_name, test=F
     
     existing_paths = os.path.join(save_path, model_name)
     if os.path.exists(existing_paths):
+        print(f'######## Train Val Split Exist ########')
         file_path = os.path.join(existing_paths, 'train_list.pkl')
         with open(file_path, "rb") as f:
             train_datalist = pickle.load(f)
@@ -279,6 +280,7 @@ def get_train_val_test_loader_from_train(data_dir, save_path, model_name, test=F
         with open(file_path, "rb") as f:
             val_datalist = pickle.load(f)
     else:
+        print(f'######## Creating Train Val Split ########')
         random.seed(seed)
         # random_state = random.random
         random.shuffle(rest_paths)

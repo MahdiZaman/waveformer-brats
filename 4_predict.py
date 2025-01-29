@@ -15,6 +15,7 @@ from light_training.prediction import Predictor
 data_dir = "../SegMamba/data/fullres/train"
 logdir = f"./logs/segmamba"
 data_list_path = f"./data_list"
+model_name = "model_loss_dice_opt_adamw"
 env = "pytorch"
 max_epoch = 1000
 batch_size = 2
@@ -59,7 +60,6 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
         
-        model_name = "model_loss_dice_opt_adamw"
         model_path = f"./logs/segmamba/{model_name}/best_model_0.9286.pth"
         model_dict = torch.load(model_path, map_location="cpu")
         new_sd = self.filte_state_dict(model_dict['model'])
@@ -141,7 +141,7 @@ if __name__ == "__main__":
                             master_port=17751,
                             training_script=__file__)
     
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, test=True)
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, model_name, test=True)
 
     trainer.validation_single_gpu(test_ds)
 

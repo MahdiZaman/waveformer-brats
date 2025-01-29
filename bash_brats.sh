@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=train_brats_idwt_dice_adamw_4_gpu
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_idwt_dice_adamw_4_gpu.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_idwt_dice_adamw_4_gpu.%J.err
+#SBATCH --job-name=train_brats_segmamba_setup
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_segmamba_setup.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_segmamba_setup.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64

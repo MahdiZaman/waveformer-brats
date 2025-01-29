@@ -12,7 +12,7 @@ set_determinism(123)
 import os
 from light_training.prediction import Predictor
 
-data_dir = "../SegMamba/data/fullres/train"
+data_dir = "./data/fullres/train"
 logdir = f"./logs/segmamba"
 data_list_path = f"./data_list"
 model_name = "model_loss_dice_opt_adamw"

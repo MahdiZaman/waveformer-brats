@@ -18,6 +18,7 @@ pretrained/*
 output/*
 logs/*
 backup/*
+prediction_results/*
 
 
 =======

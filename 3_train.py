@@ -18,7 +18,8 @@ import os
 
 data_dir = "./data/fullres/train"
 logdir = f"./logs/segmamba"
-model_name = "model_loss_dice_opt_adamw"
+# model_name = "model_loss_dice_opt_adamw"
+model_name = "segmamba_setup"
 data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
@@ -80,13 +81,13 @@ class BraTSTrainer(Trainer):
         self.ce = nn.CrossEntropyLoss() 
         self.mse = nn.MSELoss()
         self.train_process = train_process
-        # self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
-        #                             momentum=0.99, nesterov=True)
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.0001)
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
+                                    momentum=0.99, nesterov=True)
+        # self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.0001)
         
-        self.scheduler_type = "None"
+        self.scheduler_type = "poly"
         self.cross = nn.CrossEntropyLoss()
-        self.dice_loss = DiceCELoss(to_onehot_y=True, softmax=True)
+        # self.dice_loss = DiceCELoss(to_onehot_y=True, softmax=True)
 
     def training_step(self, batch):
         image, label = self.get_input(batch)
@@ -96,7 +97,7 @@ class BraTSTrainer(Trainer):
         pred = self.model(image)
         # print(f'pred:{pred.shape}')
 
-        loss = self.dice_loss(pred, label)
+        loss = self.cross(pred, label)
         # print(f' ------------- loss:{loss} global step:{self.global_step} ------------- ')
         self.log("training_loss", loss, step=self.global_step)
 
@@ -112,12 +113,8 @@ class BraTSTrainer(Trainer):
     def get_input(self, batch):
         image = batch["data"]
         label = batch["seg"]
-        # print(f'########### reading data image:{image.shape} label:{label.shape} ###################')
-        # unique_values = torch.unique(label)
-        # print(f'unique values: {unique_values}')
-        # label = label[:, 0]
     
-        # label = label[:, 0].long()
+        label = label[:, 0].long()
         return image, label
 
     def cal_metric(self, gt, pred, voxel_spacing=[1.0, 1.0, 1.0]):
@@ -178,11 +175,13 @@ class BraTSTrainer(Trainer):
             save_new_model_and_delete_last(self.model, self.optimizer, mean_dice,
                                             os.path.join(logdir, 
                                             f"best_model_{mean_dice:.4f}.pth"), 
+                                            scheduler=self.scheduler,
                                             delete_symbol="best_model")
 
         save_new_model_and_delete_last(self.model, self.optimizer, mean_dice,
                                         os.path.join(logdir, 
                                         f"final_model_{mean_dice:.4f}.pth"), 
+                                        scheduler=self.scheduler,
                                         delete_symbol="final_model")
 
 

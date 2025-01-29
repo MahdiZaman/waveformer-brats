@@ -59,8 +59,8 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
         
-        model_name = "model_upsample_inside_wd_1e-5_4_gpu"
-        model_path = f"./logs/segmamba/{model_name}/best_model_0.9269.pth"
+        model_name = "model_loss_dice_opt_adamw"
+        model_path = f"./logs/segmamba/{model_name}/best_model_0.9286.pth"
         model_dict = torch.load(model_path, map_location="cpu")
         new_sd = self.filte_state_dict(model_dict['model'])
         model.load_state_dict(new_sd)

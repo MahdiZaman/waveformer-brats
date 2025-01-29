@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=test_brats_idwt_dec_wd_1e-5_4gpu
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_brats_idwt_dec_wd_1e-5_4gpu.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_brats_idwt_dec_wd_1e-5_4gpu.%J.err
+#SBATCH --job-name=test_brats_loss_dice_opt_adamw
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_test_brats_loss_dice_opt_adamw_4gpu.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_test_brats_loss_dice_opt_adamw_4gpu.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128GB
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=256GB
 #SBATCH --partition=hpg-ai
 #SBATCH --gpus=a100:1
 #SBATCH --time=2:00:00

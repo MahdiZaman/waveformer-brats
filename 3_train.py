@@ -213,6 +213,8 @@ if __name__ == "__main__":
                             master_port=17759,
                             training_script=__file__)
 
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, model_name)
+    # split_path = model_name
+    split_path = "model_loss_dice_opt_adamw"
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, split_path)
 
     trainer.train(train_dataset=train_ds, val_dataset=val_ds)

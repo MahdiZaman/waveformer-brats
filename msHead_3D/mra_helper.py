@@ -318,7 +318,7 @@ class Block(nn.Module):
         """
         B, D, H, W, C = x.shape
         x = x.view(B,  D // window_size, window_size, H // window_size, window_size, W // window_size, window_size, C)
-        windows = x.permute(0, 1, 3, 5, 2, 4, 6, 7).contiguous().view(-1, window_size, window_size, window_size, C)
+        windows = x.permute(0, 1, 3, 5, 2, 4, 6, 7).contiguous().view(-1, window_size, window_size, window_size, C).contiguous()
         return windows
 
     def forward(self, x):
@@ -349,9 +349,9 @@ class Block(nn.Module):
         
         # B*nW, Nr, C [Here nW = 1]
         attn_windows = self.attn(x_windows) 
-        attn_windows = attn_windows.view(-1, self.window_size, self.window_size, self.window_size, C).reshape(B, output_size[0], output_size[1], output_size[2], C)   # B, D, H, W, C [Here nW = 1]
+        attn_windows = attn_windows.view(-1, self.window_size, self.window_size, self.window_size, C).reshape(B, output_size[0], output_size[1], output_size[2], C)  # B, D, H, W, C [Here nW = 1]
         # attn_windows = attn_windows.reshape(B, output_size[0], output_size[1], output_size[2], C)
-        x = attn_windows.permute(0, 4, 1, 2, 3)         # B, C, D1, H1, W1 [Here nW = 1]
+        x = attn_windows.permute(0, 4, 1, 2, 3).contiguous()         # B, C, D1, H1, W1 [Here nW = 1]
         # print(f'attn reshape:{x.shape}')
         if self.level > 0:
             # inp_tuple = (x,) + x_h

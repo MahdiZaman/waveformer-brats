@@ -137,7 +137,7 @@ class BraTSTrainer(Trainer):
         output = output[:, None]
         output = self.convert_labels(output)
 
-        # label = label[:, None]
+        label = label[:, None]
         label = self.convert_labels(label)
         output = output.cpu().numpy()
         target = label.cpu().numpy()

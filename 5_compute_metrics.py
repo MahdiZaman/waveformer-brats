@@ -19,7 +19,8 @@ parser.add_argument("--pred_name", required=True, type=str)
 results_root = "prediction_results"
 args = parser.parse_args()
 # model_name = "model_upsample_inside_wd_1e-5_4_gpu"
-model_name = "model_loss_dice_opt_adamw"
+# model_name = "model_loss_dice_opt_adamw"
+model_name = "segmamba_setup"
 pred_name = args.pred_name
 
 def cal_metric(gt, pred, voxel_spacing):
@@ -52,7 +53,8 @@ if __name__ == "__main__":
     logdir = f"./logs/segmamba"
     data_list_path = f"./data_list"
     raw_data_dir = "./data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData/"
-    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, model_name, test=True)
+    split_path = "model_loss_dice_opt_adamw"
+    train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, split_path, test=True)
     print(len(test_ds))
     all_results = np.zeros((250,3,2))
 

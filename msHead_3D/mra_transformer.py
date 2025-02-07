@@ -29,7 +29,7 @@ from mra_helper import Block, PatchMerging
 
 # How to apply multihead multiscale
 class MRATransformer(nn.Module):
-    def __init__(self, img_size=(96, 96, 96), patch_size=2, in_chans=4, num_classes=5, embed_dims=[48, 96, 192, 384], 
+    def __init__(self, img_size=(128, 128, 128), patch_size=2, in_chans=4, num_classes=4, embed_dims=[48, 96, 192, 384], 
                  num_heads=[3, 6, 12, 24], mlp_ratios=[4, 4, 4, 4], qkv_bias=False, qk_scale=None, drop_rate=0.,
                  attn_drop_rate=0., drop_path_rate=0., spatial_dims=3, norm_layer=nn.LayerNorm, patch_norm=False, 
                  depths=[2, 2, 2, 2]):
@@ -158,24 +158,21 @@ class MRATransformer(nn.Module):
         """
         x_rgb: B x C x D x H x W
         """
-        # print(f'input: {x_rgb.shape}')
         outs = []
-        outs_hf = []
+
         B, C, D, H, W = x_rgb.shape
         ######## Patch Embedding
-        x0 = self.patch_embed(x_rgb)                # B, c, d, h, w  
+        x0 = self.patch_embed(x_rgb)                # B, c, d, h, w         
         x0 = self.pos_drop(x0)
         ########################
         x1 = rearrange(x0, "b c d h w -> b d h w c")
-
         # stage 1
         b,d,h,w,c = x1.shape        
         for j,blk in enumerate(self.block1):
-            x1, x_h = blk(x1)       # B, d, h, w, c
+            x1 = blk(x1)       # B, d, h, w, c
         x1_out = rearrange(x1, "b d h w c -> b c d h w")
         x1_out = self.proj_out(x1_out, normalize)
         outs.append(x1_out)
-        outs_hf.append(x_h)
 
         x2 = self.downsample_1(x1)
         #######################
@@ -183,11 +180,10 @@ class MRATransformer(nn.Module):
         # stage 2
         b,d,h,w,c = x2.shape
         for j,blk in enumerate(self.block2):
-            x2, x_h = blk(x2)
+            x2 = blk(x2)
         x2_out = rearrange(x2, "b d h w c -> b c d h w")
         x2_out = self.proj_out(x2_out, normalize)
         outs.append(x2_out)
-        outs_hf.append(x_h)
 
         x3 = self.downsample_2(x2)
         #######################
@@ -196,11 +192,10 @@ class MRATransformer(nn.Module):
         # stage 3
         b,d,h,w,c = x3.shape
         for j,blk in enumerate(self.block3):
-            x3, x_h = blk(x3)
+            x3 = blk(x3)
         x3_out = rearrange(x3, "b d h w c -> b c d h w")
         x3_out = self.proj_out(x3_out, normalize)
         outs.append(x3_out)
-        outs_hf.append(x_h)
 
         x4 = self.downsample_3(x3)
         ########################
@@ -214,11 +209,11 @@ class MRATransformer(nn.Module):
         outs.append(x4_out)
         ########################
 
-        return outs, outs_hf
+        return outs
 
     def forward(self, x_rgb):
-        outs, outs_hf = self.forward_features(x_rgb)
-        return outs, outs_hf
+        outs = self.forward_features(x_rgb)
+        return outs
 
     def flops(self):
         flops = 0
@@ -250,11 +245,18 @@ class mra_b0(MRATransformer):
 
 
 if __name__=="__main__":
+
+    B = 2
+    C = 4
+    D = 128
+    H = 128
+    W = 128
+    
     backbone = mra_b0(
-        img_size=(96, 96, 96),
-        in_chans = 4,
+        img_size=(D, H, W),
         patch_size=2,
-        num_classes=5,
+        num_classes=4,
+        in_chans=C,
         embed_dims=[48,96,192,384],
         depths=[2,2,2,2],
         num_heads = [3,6,12,24],
@@ -262,14 +264,10 @@ if __name__=="__main__":
     )
     
     # ########print(backbone)
-    B = 2
-    C = 4
-    D = 128
-    H = 128
-    W = 128
+    
     device = 'cuda:1'
     rgb = torch.randn(B, C, D, H, W)
-    outputs, outputs_hf = backbone(rgb)
+    outputs = backbone(rgb)
     for i,out in enumerate(outputs):
         print(f'{i}:{out.size()}')
 

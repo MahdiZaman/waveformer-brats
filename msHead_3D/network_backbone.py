@@ -32,9 +32,8 @@ from monai.networks.blocks.unetr_block import UnetrBasicBlock, UnetrUpBlock
 from typing import Union
 
 from lib.models.tools.module_helper import ModuleHelper
-# from networks.UXNet_3D.uxnet_encoder import uxnet_conv
 from msHead_3D.mra_transformer import mra_b0
-from idwt_upsample import UnetrIDWTBlock
+from idwt_upsample import UpsampleBlock
 
 
 
@@ -202,6 +201,7 @@ class MSHEAD_ATTN(nn.Module):
         self.feat_size = feat_size
         self.layer_scale_init_value = layer_scale_init_value
         self.out_indice = []
+
         for i in range(len(self.depths)):
             self.out_indice.append(i)
 
@@ -260,17 +260,7 @@ class MSHEAD_ATTN(nn.Module):
                 norm_layer=nn.InstanceNorm3d
         )
 
-        # self.encoder10 = UnetrBasicBlock(
-        #     spatial_dims=spatial_dims,
-        #     in_channels=self.feat_size[3],
-        #     out_channels=self.feat_size[3],
-        #     kernel_size=1,
-        #     stride=1,
-        #     norm_name=norm_name,
-        #     res_block=res_block,
-        # )
-
-        self.decoder4 = UnetrIDWTBlock(
+        self.decoder4 = UpsampleBlock(
             spatial_dims=spatial_dims,
             in_channels=self.feat_size[3],
             out_channels=self.feat_size[2],
@@ -280,7 +270,7 @@ class MSHEAD_ATTN(nn.Module):
             res_block=res_block,
         )
 
-        self.decoder3 = UnetrIDWTBlock(
+        self.decoder3 = UpsampleBlock(
             spatial_dims=spatial_dims,
             in_channels=self.feat_size[3],
             out_channels=self.feat_size[1],
@@ -290,7 +280,7 @@ class MSHEAD_ATTN(nn.Module):
             res_block=res_block,
         )
 
-        self.decoder2 = UnetrIDWTBlock(
+        self.decoder2 = UpsampleBlock(
             spatial_dims=spatial_dims,
             in_channels=self.feat_size[3],
             out_channels=self.feat_size[0],
@@ -328,8 +318,7 @@ class MSHEAD_ATTN(nn.Module):
         return x
     
     def forward(self, x_in):
-        # print(f'x_in:{x_in.dtype}')
-        outs, outs_hf = self.multiscale_transformer(x_in)
+        outs = self.multiscale_transformer(x_in)
 
         enc0 = self.encoder1(x_in)
         #print(f'enc0 input:{x_in.shape} output:{enc0.size()}')
@@ -346,11 +335,11 @@ class MSHEAD_ATTN(nn.Module):
         dec5 = self.encoder10(outs[3])
         #print(f'bottleneck:{dec5.shape}')
 
-        dec4 = self.decoder4(dec5, enc3, outs_hf[-1])
+        dec4 = self.decoder4(dec5, enc3)
         #print(f'dec4: {dec4.shape}')
-        dec3 = self.decoder3(dec5, enc2, outs_hf[-2])
+        dec3 = self.decoder3(dec5, enc2)
         #print(f'dec3: {dec3.shape}')
-        dec2 = self.decoder2(dec5, enc1, outs_hf[-3])
+        dec2 = self.decoder2(dec5, enc1)
         #print(f'dec2: {dec2.shape}')
 
         # Learnable upsampling
@@ -381,9 +370,9 @@ if __name__=="__main__":
     num_classes = 4
     img_size = (D,H,W)
     model = MSHEAD_ATTN(
-        img_size=img_size,
-        in_chans=C,
+        img_size=(D, H, W),
         patch_size=2,
+        in_chans=C,
         out_chans=num_classes,
         depths=[2,2,2,2],
         feat_size=[48,96,192,384],
@@ -409,7 +398,6 @@ if __name__=="__main__":
     # # Register the hook for all layers
     # for layer in model.children():
     #     layer.register_forward_hook(hook_fn)
-    print(f'input:{x.dtype}')
     outputs = model(x)
     print(f'outputs: {outputs.shape}')
 

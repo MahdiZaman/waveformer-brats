@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=train_brats_segmamba_setup
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_segmamba_setup.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_segmamba_setup.%J.err
+#SBATCH --job-name=train_brats_ablation_pooling
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_ablation_pooling.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/brats_ablation_pooling.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64

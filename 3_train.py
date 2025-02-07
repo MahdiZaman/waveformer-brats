@@ -137,7 +137,10 @@ class BraTSTrainer(Trainer):
         output = output[:, None]
         output = self.convert_labels(output)
 
-        # label = label[:, None]
+        # in dice loss training, label already B,1,D,H,W. No need to add another dim
+        # if using CE, label is made long -->B,D,H,W... So, need to add a dimension 
+        
+        # label = label[:, None]    
         label = self.convert_labels(label)
         output = output.cpu().numpy()
         target = label.cpu().numpy()

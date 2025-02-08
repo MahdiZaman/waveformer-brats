@@ -15,7 +15,7 @@ from light_training.prediction import Predictor
 data_dir = "./data/fullres/train"
 logdir = f"./logs/segmamba"
 data_list_path = f"./data_list"
-model_name = "segmamba_setup"
+model_name = "brats_ablation_pooling"
 env = "pytorch"
 max_epoch = 1000
 batch_size = 2
@@ -60,7 +60,7 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
         
-        model_path = f"./logs/segmamba/{model_name}/best_model_0.9217.pth"
+        model_path = f"./logs/segmamba/{model_name}/best_model_0.9364.pth"
         model_dict = torch.load(model_path, map_location="cpu")
         new_sd = self.filte_state_dict(model_dict['model'])
         model.load_state_dict(new_sd)

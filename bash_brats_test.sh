@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=test_brats_loss_dice_opt_adamw
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_test_brats_loss_dice_opt_adamw_4gpu.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_test_brats_loss_dice_opt_adamw_4gpu.%J.err
+#SBATCH --job-name=test_brats_ablation_pooling
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_brats_ablation_pooling.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/test_brats_ablation_pooling.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32

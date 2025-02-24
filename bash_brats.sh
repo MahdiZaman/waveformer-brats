@@ -8,7 +8,7 @@
 #SBATCH --mem=512GB
 #SBATCH --partition=hpg-ai
 #SBATCH --gpus=a100:4
-#SBATCH --time=30:00:00
+#SBATCH --time=24:00:00
 
 module load conda
 conda activate waveformer

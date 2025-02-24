@@ -210,6 +210,7 @@ class MSHEAD_ATTN(nn.Module):
 
         self.multiscale_transformer = mra_b0(
             img_size = self.img_size,
+            in_chans = self.in_chans,
             patch_size= self.patch_size,
             num_classes = out_chans,
             embed_dims = self.feat_size,

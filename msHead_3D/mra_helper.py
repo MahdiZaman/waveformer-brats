@@ -28,6 +28,56 @@ from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 
 
 
+class ProjectionUpsample(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=2, residual=True, use_double_conv=False):
+        super(ProjectionUpsample, self).__init__()
+
+        self.do_res = residual
+        self.stride = stride
+        self.use_double_conv = use_double_conv
+
+        # Bilinear Upsampling + 3x3x3 Depthwise Conv
+        self.conv1 = nn.Sequential(
+            nn.Upsample(scale_factor=stride, mode='trilinear', align_corners=True),
+            nn.Conv3d(in_channels, in_channels, kernel_size=3, padding=1, groups=in_channels)
+        )
+
+        # Channel-wise Interaction (1x1x1 conv)
+        self.conv2 = nn.Conv3d(in_channels, in_channels * 2, kernel_size=1, stride=1)
+
+        # Channel Projection
+        if self.use_double_conv:  # double conv for large reductions (e.g., 192 → 48)
+            self.conv3 = nn.Sequential(
+                nn.Conv3d(in_channels * 2, in_channels, kernel_size=1),
+                nn.GELU(),
+                nn.Conv3d(in_channels, out_channels, kernel_size=1)
+            )
+        else:  # Apply single conv for small reductions (e.g., 96 → 48)
+            self.conv3 = nn.Conv3d(in_channels * 2, out_channels, kernel_size=1)
+
+        self.norm = nn.GroupNorm(num_groups=in_channels, num_channels=in_channels)
+
+        # Residual Path
+        if self.do_res:
+            self.res_conv = nn.Sequential(
+                nn.Upsample(scale_factor=stride, mode='trilinear', align_corners=True),
+                nn.Conv3d(in_channels, out_channels, kernel_size=1, stride=1)
+            )
+
+        self.act = nn.GELU()
+
+    def forward(self, x):
+        x1 = x
+        x1 = self.conv1(x1)  # Upsampling
+        x1 = self.act(self.conv2(self.norm(x1)))  # Refinement
+        x1 = self.conv3(x1)  # Final Projection
+
+        if self.do_res:
+            res = self.res_conv(x)  # Residual Connection
+            x1 = x1 + res  # Merge Features
+
+        return x1
+
 
 # logger = get_logger()
 
@@ -249,35 +299,20 @@ class Mlp(nn.Module):
         flops_mlp += self.fc2.in_features * self.fc2.out_features * 2
         return flops_mlp
     
-import torch
-import torch.nn as nn
-
-class PoolingTransform3D(nn.Module):
-    def __init__(self, output_size=(8, 8, 8)):
-        """
-        Replaces WaveletTransform3D with Max & Average Pooling.
-        Args:
-            output_size (tuple): Desired output dimensions (D, H, W).
-            mode (str): "max", "avg", or "both" to determine pooling type.
-        """
-        super(PoolingTransform3D, self).__init__()
-        self.output_size = output_size
+class WaveletTransform3D(torch.nn.Module):
+    def __init__(self, wavelet='db1', level=5, mode='zero'):
+        super(WaveletTransform3D, self).__init__()
+        self.wavelet = wavelet #pywt.Wavelet(wavelet)
+        self.level = level
+        self.mode = mode
 
     def forward(self, x):
-        """
-        Input: x of shape (B, C, D, H, W)
-        Output: x_pooled of shape (B, C, 6, 6, 6) with max/avg pooled features
-        """
-        B, C, D, H, W = x.shape
-        # Max Pooling
-        max_pooled = F.adaptive_max_pool3d(x, self.output_size)  # (B, C, 6, 6, 6)
-        # Average Pooling
-        avg_pooled = F.adaptive_avg_pool3d(x, self.output_size)  # (B, C, 6, 6, 6)
-
-        x_pooled = max_pooled + avg_pooled
-
-        return x_pooled
-
+        # print(f'x:{x.shape}  ')
+        coeffs = ptwt.wavedec3(x, wavelet=self.wavelet, level=self.level, mode=self.mode)
+        Yl  = coeffs[0]  # Extracting the approximation coefficients
+        Yh = coeffs[1:]
+        # print(f'Yl:{Yl.shape}')
+        return Yl, Yh
 
 
 class Block(nn.Module):
@@ -289,17 +324,15 @@ class Block(nn.Module):
         self.mlp_ratio = mlp_ratio
         self.level = level
         mlp_hidden_dim = int(dim * mlp_ratio)
-        self.window_size = self.img_size[0]//pow(2, level)
 
         if self.level > 0:
-            output_shape = (self.window_size, self.window_size, self.window_size)
-            self.downsamples = PoolingTransform3D(output_shape)
-        
+            self.dwt_downsamples = WaveletTransform3D(wavelet='haar', level=self.level)
+        self.window_size = self.img_size[0]//pow(2, level)
 
         self.norm1 = norm_layer(dim)
         self.attn = WindowAttention(
             dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale,
-            attn_drop=attn_drop, proj_drop=drop, window_size = self.window_size, img_size=img_size)
+            attn_drop=attn_drop, proj_drop=drop, window_size=self.window_size, img_size=img_size)
 
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
@@ -350,7 +383,7 @@ class Block(nn.Module):
         x = x.view(B, D, H, W, C)
         if self.level > 0:
             x = x.permute(0, 4, 1, 2, 3).contiguous()#B,C,D,H,W
-            x = self.downsamples(x)
+            x, x_h = self.dwt_downsamples(x)
             x = x.permute(0, 2, 3, 4, 1).contiguous() #B,D1,H1,W1,C
         # print(f'DWT_x:{x.shape} {x.dtype} shortcut:{shortcut.shape}')
         # for coeff in x_h:
@@ -367,8 +400,10 @@ class Block(nn.Module):
         
         # B*nW, Nr, C [Here nW = 1]
         attn_windows = self.attn(x_windows) 
-        attn_windows = attn_windows.view(-1, self.window_size, self.window_size, self.window_size, C).reshape(B, output_size[0], output_size[1], output_size[2], C)  # B, D, H, W, C [Here nW = 1]
-        x = attn_windows.permute(0, 4, 1, 2, 3).contiguous()         # B, C, D1, H1, W1 [Here nW = 1]
+        attn_windows = attn_windows.view(-1, self.window_size, self.window_size, self.window_size, C).reshape(B, output_size[0], output_size[1], output_size[2], C)   # B, D, H, W, C [Here nW = 1]
+        # attn_windows = attn_windows.reshape(B, output_size[0], output_size[1], output_size[2], C)
+        x = attn_windows.permute(0, 4, 1, 2, 3)         # B, C, D1, H1, W1 [Here nW = 1]
+        # print(f'attn reshape:{x.shape}')
         if self.level > 0:
             # inp_tuple = (x,) + x_h
             # x = ptwt.waverec3(inp_tuple, wavelet='db1')
@@ -377,6 +412,8 @@ class Block(nn.Module):
         x = x.permute(0, 2, 3, 4, 1).contiguous()                    # B, D, H, W, C
         x = shortcut + self.drop_path(x)
         x = x + self.drop_path(self.mlp(self.norm2(x)))              # B, D, H, W, C
+        if self.level > 0:
+            return x, x_h
         return x
     
     def flops(self):

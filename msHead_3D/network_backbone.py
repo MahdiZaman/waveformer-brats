@@ -32,8 +32,10 @@ from monai.networks.blocks.unetr_block import UnetrBasicBlock, UnetrUpBlock
 from typing import Union
 
 from lib.models.tools.module_helper import ModuleHelper
+# from networks.UXNet_3D.uxnet_encoder import uxnet_conv
 from msHead_3D.mra_transformer import mra_b0
-from idwt_upsample import UpsampleBlock
+from idwt_upsample import UnetrIDWTBlock
+from msHead_3D.mra_helper import ProjectionUpsample
 
 
 
@@ -201,7 +203,6 @@ class MSHEAD_ATTN(nn.Module):
         self.feat_size = feat_size
         self.layer_scale_init_value = layer_scale_init_value
         self.out_indice = []
-
         for i in range(len(self.depths)):
             self.out_indice.append(i)
 
@@ -209,7 +210,6 @@ class MSHEAD_ATTN(nn.Module):
 
         self.multiscale_transformer = mra_b0(
             img_size = self.img_size,
-            in_chans = self.in_chans,
             patch_size= self.patch_size,
             num_classes = out_chans,
             embed_dims = self.feat_size,
@@ -260,46 +260,55 @@ class MSHEAD_ATTN(nn.Module):
                 norm_layer=nn.InstanceNorm3d
         )
 
-        self.decoder4 = UpsampleBlock(
+        # self.encoder10 = UnetrBasicBlock(
+        #     spatial_dims=spatial_dims,
+        #     in_channels=self.feat_size[3],
+        #     out_channels=self.feat_size[3],
+        #     kernel_size=1,
+        #     stride=1,
+        #     norm_name=norm_name,
+        #     res_block=res_block,
+        # )
+
+        self.decoder4 = UnetrIDWTBlock(
             spatial_dims=spatial_dims,
             in_channels=self.feat_size[3],
             out_channels=self.feat_size[2],
+            stage = 1,
             wavelet='db1',
             kernel_size=3,
             norm_name=norm_name,
             res_block=res_block,
         )
 
-        self.decoder3 = UpsampleBlock(
+        self.decoder3 = UnetrIDWTBlock(
             spatial_dims=spatial_dims,
             in_channels=self.feat_size[3],
             out_channels=self.feat_size[1],
+            stage = 2,
             wavelet='db1',
             kernel_size=3,
             norm_name=norm_name,
             res_block=res_block,
         )
 
-        self.decoder2 = UpsampleBlock(
+        self.decoder2 = UnetrIDWTBlock(
             spatial_dims=spatial_dims,
             in_channels=self.feat_size[3],
             out_channels=self.feat_size[0],
+            stage = 3,
             wavelet='db1',
             kernel_size=3,
             norm_name=norm_name,
             res_block=res_block,
         )
         
-        self.learnable_up4 = nn.ConvTranspose3d(self.feat_size[2], self.feat_size[2], kernel_size=4, stride=4)
-        self.learnable_up3 = nn.ConvTranspose3d(self.feat_size[1], self.feat_size[1], kernel_size=2, stride=2)
-        self.projection = nn.Sequential(
-                nn.Conv3d(self.feat_size[2]+self.feat_size[1]+self.feat_size[0], self.feat_size[0], kernel_size=1),
-                nn.InstanceNorm3d(self.feat_size[0])
-        )
+        self.learnable_up4 = ProjectionUpsample(in_channels=self.feat_size[2], out_channels=self.feat_size[0], stride=4, residual=True, use_double_conv=True)
+        self.learnable_up3 = ProjectionUpsample(in_channels=self.feat_size[1], out_channels=self.feat_size[0], stride=2, residual=True)
         
         self.decoder1 = UnetrUpBlock(
             spatial_dims=spatial_dims,
-            in_channels=self.feat_size[0],
+            in_channels=self.feat_size[0]*3,
             out_channels=self.feat_size[0],
             kernel_size=3,
             upsample_kernel_size=2,
@@ -318,42 +327,28 @@ class MSHEAD_ATTN(nn.Module):
         return x
     
     def forward(self, x_in):
-        outs = self.multiscale_transformer(x_in)
-
+        outs, outs_hf = self.multiscale_transformer(x_in)
+        # Residual Layers on features
         enc0 = self.encoder1(x_in)
-        #print(f'enc0 input:{x_in.shape} output:{enc0.size()}')
-
         enc1 = self.encoder2(outs[0])
-        #print(f'enc1 input:{outs[0].shape} output:{enc1.size()}')
-
         enc2 = self.encoder3(outs[1])
-        #print(f'enc2:input:{outs[1].shape} output:{enc2.size()}')
-
         enc3 = self.encoder4(outs[2])
-        #print(f'enc3:input:{outs[2].shape} output:{enc3.size()}')
 
+        # Channel Calibration
         dec5 = self.encoder10(outs[3])
-        #print(f'bottleneck:{dec5.shape}')
 
-        dec4 = self.decoder4(dec5, enc3)
-        #print(f'dec4: {dec4.shape}')
-        dec3 = self.decoder3(dec5, enc2)
-        #print(f'dec3: {dec3.shape}')
-        dec2 = self.decoder2(dec5, enc1)
-        #print(f'dec2: {dec2.shape}')
+        # Decoder
+        dec4 = self.decoder4(dec5, enc3, outs_hf[-1])
+        dec3 = self.decoder3(dec5, enc2, outs_hf[-2])
+        dec2 = self.decoder2(dec5, enc1, outs_hf[-3])
 
         # Learnable upsampling
         dec4_upsampled = self.learnable_up4(dec4)
         dec3_upsampled = self.learnable_up3(dec3)
-        # print(f'upsampled dec4:{dec4_upsampled.shape} dec3:{dec3_upsampled.shape}')
 
         # Fuse all decoder features
         combined = torch.cat([dec4_upsampled, dec3_upsampled, dec2], dim=1)  # Concatenate along channel dimension
-        # print(f'combined shape:{combined.shape}')
-        proj = self.projection(combined)
-        # print(f'proj:{proj.shape}')
-        dec1 = self.decoder1(proj, enc0)
-        # print(f'dec1: {dec1.shape}')
+        dec1 = self.decoder1(combined, enc0)
         
         return self.out(dec1)
     

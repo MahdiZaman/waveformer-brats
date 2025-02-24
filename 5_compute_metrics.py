@@ -21,7 +21,9 @@ args = parser.parse_args()
 # model_name = "model_upsample_inside_wd_1e-5_4_gpu"
 # model_name = "model_loss_dice_opt_adamw"
 # model_name = "segmamba_setup"
-model_name = "brats_ablation_pooling"
+# model_name = "brats_ablation_pooling"
+model_name = "residual_up_idwt_dec"
+
 pred_name = args.pred_name
 
 def cal_metric(gt, pred, voxel_spacing):

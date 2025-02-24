@@ -19,7 +19,8 @@ import os
 data_dir = "./data/fullres/train"
 logdir = f"./logs/segmamba"
 # model_name = "model_loss_dice_opt_adamw"
-model_name = "brats_ablation_pooling"
+# model_name = "brats_ablation_pooling"
+model_name = "residual_up_idwt_dec"
 data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')

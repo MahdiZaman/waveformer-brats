@@ -15,7 +15,8 @@ from light_training.prediction import Predictor
 data_dir = "./data/fullres/train"
 logdir = f"./logs/segmamba"
 data_list_path = f"./data_list"
-model_name = "brats_ablation_pooling"
+# model_name = "brats_ablation_pooling"
+model_name = "brats_ablation_max_pool"
 env = "pytorch"
 max_epoch = 1000
 batch_size = 2

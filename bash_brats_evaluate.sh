@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=eval_brats_residual_up_idwt_dec
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_residual_up_idwt_dec.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_residual_up_idwt_dec.%J.err
+#SBATCH --job-name=eval_brats_residual_up_idwt_dec_multilevel
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_residual_up_idwt_dec_multilevel.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/eval_brats_residual_up_idwt_dec_multilevel.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16

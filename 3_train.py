@@ -16,8 +16,8 @@ import datetime
 import time
 import os
 
-data_dir = "./data/fullres/train"
-logdir = f"./logs/segmamba"
+data_dir = "/project/data/fullres/train"
+logdir = f"/project/logs/segmamba"
 # model_name = "model_loss_dice_opt_adamw"
 # model_name = "brats_ablation_pooling"
 # model_name = "residual_up_idwt_dec"
@@ -217,8 +217,7 @@ if __name__ == "__main__":
                             training_script=__file__)
 
     # split_path = model_name
-    # split_path = "model_loss_dice_opt_adamw"
-    split_path = "nautilus_split"
+    split_path = "model_loss_dice_opt_adamw"
     train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir, data_list_path, split_path)
 
     trainer.train(train_dataset=train_ds, val_dataset=val_ds)

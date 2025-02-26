@@ -16,8 +16,8 @@ import datetime
 import time
 import os
 
-data_dir = "./data/fullres/train"
-logdir = f"./logs/segmamba"
+data_dir = "/project/fullres/train"
+logdir = f"/project/logs/segmamba"
 # model_name = "model_loss_dice_opt_adamw"
 # model_name = "brats_ablation_pooling"
 # model_name = "residual_up_idwt_dec"

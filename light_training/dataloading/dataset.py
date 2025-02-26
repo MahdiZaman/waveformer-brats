@@ -275,10 +275,11 @@ def get_train_val_test_loader_from_train(data_dir, save_path, split_path, test=F
         file_path = os.path.join(existing_paths, 'train_list.pkl')
         with open(file_path, "rb") as f:
             train_datalist = pickle.load(f)
-        
+        train_datalist = [path.replace('./data','/project') for path in train_datalist]
         file_path = os.path.join(existing_paths, 'val_list.pkl')
         with open(file_path, "rb") as f:
             val_datalist = pickle.load(f)
+        val_datalist = [path.replace('./data','/project') for path in val_datalist]
     else:
         print(f'######## Creating Train Val Split ########')
         random.seed(seed)

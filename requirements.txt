@@ -1,0 +1,11 @@
+monai
+numpy
+tqdm
+tensorboard
+scipy
+scikit-learn
+scikit-image
+ptflops
+nibabel
+pillow
+timm

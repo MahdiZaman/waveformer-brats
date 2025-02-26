@@ -22,7 +22,8 @@ args = parser.parse_args()
 # model_name = "model_loss_dice_opt_adamw"
 # model_name = "segmamba_setup"
 # model_name = "brats_ablation_pooling"
-model_name = "residual_up_idwt_dec"
+# model_name = "residual_up_idwt_dec"
+model_name = "simple_up_idwt_dec"
 
 pred_name = args.pred_name
 

@@ -21,7 +21,8 @@ logdir = f"/project/logs/segmamba"
 # model_name = "model_loss_dice_opt_adamw"
 # model_name = "brats_ablation_pooling"
 # model_name = "residual_up_idwt_dec"
-model_name = "res_up_simple_ref_idwt_dec"
+# model_name = "res_up_simple_ref_idwt_dec"
+model_name = "hf_agg_simp_ref_res_up"
 data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')

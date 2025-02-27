@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=train_brats_hf_agg_res_up_simple_ref
-#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/train_brats_hf_agg_res_up_simple_ref.%J.out
-#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/train_brats_hf_agg_res_up_simple_ref.%J.err
+#SBATCH --job-name=train_brats_multilevel_hf_agg_res_up_simple_ref
+#SBATCH --output=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/train_brats_multilevel_hf_agg_res_up_simple_ref.%J.out
+#SBATCH --error=/blue/r.forghani/mdmahfuzalhasan/scripts/waveformer-brats/results/train_brats_multilevel_hf_agg_res_up_simple_ref.%J.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64

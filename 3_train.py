@@ -23,7 +23,7 @@ logdir = f"/project/logs/segmamba"
 # model_name = "residual_up_idwt_dec"
 # model_name = "res_up_simple_ref_idwt_dec"
 # model_name = "hf_agg_simp_ref_res_up"
-model_name = "multilevel_hf_agg_sim_ref_res_up"
+model_name = "multilevel_hf_agg_simp_ref_res_up"
 data_list_path = f"./data_list"
 
 # run_id = datetime.datetime.today().strftime('%m-%d-%y_%H%M')
@@ -84,7 +84,7 @@ class BraTSTrainer(Trainer):
         #                             momentum=0.99, nesterov=True)
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.0001)
 
-        model_path = "/project/logs/segmamba/multilevel_hf_agg_simp_ref_res_up/final_model_0.9188.pth"
+        model_path = "/project/logs/segmamba/multilevel_hf_agg_simp_ref_res_up/tmp_model_ep399_0.8918.pth"
         self.best_mean_dice = 0.9208
         self.load_state_dict(model_path)
         

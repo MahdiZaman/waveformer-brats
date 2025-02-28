@@ -405,7 +405,7 @@ class Trainer:
             self.scheduler = PolyLRScheduler(self.optimizer, initial_lr=lr, max_steps=self.max_steps)
             print(f"scheduler_type is poly, warmup steps is {0}")
 
-        for epoch in range(471, self.max_epochs):
+        for epoch in range(400, self.max_epochs):
             self.epoch = epoch 
             if self.ddp:
                 torch.distributed.barrier()

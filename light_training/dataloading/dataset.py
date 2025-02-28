@@ -250,7 +250,7 @@ def save_data_list(data_list, path, file_name):
             pickle.dump(data_list, f)
 
 
-def get_train_val_test_loader_from_train(data_dir, save_path, split_path, test=False, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
+def get_train_val_test_loader_from_train(data_dir, save_path, split_path, test=False, nautilus=False, train_rate=0.7, val_rate=0.1, test_rate=0.2, seed=42):
     ## train all labeled data 
     ## fold denote the validation data in training data
     all_paths = glob.glob(f"{data_dir}/*.npz")
@@ -275,11 +275,15 @@ def get_train_val_test_loader_from_train(data_dir, save_path, split_path, test=F
         file_path = os.path.join(existing_paths, 'train_list.pkl')
         with open(file_path, "rb") as f:
             train_datalist = pickle.load(f)
-        train_datalist = [path.replace('./data','/project') for path in train_datalist]
+        
         file_path = os.path.join(existing_paths, 'val_list.pkl')
         with open(file_path, "rb") as f:
             val_datalist = pickle.load(f)
-        val_datalist = [path.replace('./data','/project') for path in val_datalist]
+        
+        if nautilus:
+            train_datalist = [path.replace('./data','/project') for path in train_datalist]
+            val_datalist = [path.replace('./data','/project') for path in val_datalist]
+
     else:
         print(f'######## Creating Train Val Split ########')
         random.seed(seed)

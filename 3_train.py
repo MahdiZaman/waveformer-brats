@@ -75,19 +75,18 @@ class BraTSTrainer(Trainer):
             use_checkpoint=False,
         )
 
-        # self.model = SegMamba(in_chans=4,
-        #                 out_chans=4,
-        #                 depths=[2,2,2,2],
-        #                 feat_size=[48, 96, 192, 384])
-
         self.patch_size = roi_size
-        self.best_mean_dice = 0.0
+        # self.best_mean_dice = 0.0
         self.ce = nn.CrossEntropyLoss() 
         self.mse = nn.MSELoss()
         self.train_process = train_process
         # self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
         #                             momentum=0.99, nesterov=True)
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.0001)
+
+        model_path = "/project/logs/segmamba/multilevel_hf_agg_simp_ref_res_up/final_model_0.9188.pth"
+        self.best_mean_dice = 0.9208
+        self.load_state_dict(model_path)
         
         self.scheduler_type = None
         # self.cross = nn.CrossEntropyLoss()

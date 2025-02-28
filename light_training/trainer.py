@@ -437,7 +437,7 @@ class Trainer:
         # if self.local_rank == 0:
         # with tqdm(total=self.num_step_per_epoch, disable=(self.local_rank != 0)) as t:
         epoch_loss_values = []
-        for i in range(self.num_step_per_epoch):
+        for i in range(470, self.num_step_per_epoch):
             self.global_step += 1
             # t.set_description('Epoch %i' % epoch)
             # if self.print_time:
@@ -503,7 +503,8 @@ class Trainer:
                 self.writer.add_scalar(k, scalar_value=v, global_step=step)
                 
     def load_state_dict(self, weight_path, strict=True):
-        sd = torch.load(weight_path, map_location="cpu")
+        sd_dict = torch.load(weight_path, map_location="cpu")
+        sd = sd_dict['model']
         if "module" in sd :
             sd = sd["module"]
         new_sd = {}
@@ -513,5 +514,7 @@ class Trainer:
             new_sd[new_k] = v 
 
         self.model.load_state_dict(new_sd, strict=strict)
+        sd_optim = sd_dict['optimizer']
+        self.optimizer.load_state_dict(sd_optim)
         
         print(f"model parameters are loaded successed.")

@@ -437,7 +437,7 @@ class Trainer:
         # if self.local_rank == 0:
         # with tqdm(total=self.num_step_per_epoch, disable=(self.local_rank != 0)) as t:
         epoch_loss_values = []
-        for i in range(470, self.num_step_per_epoch):
+        for i in range(471, self.num_step_per_epoch):
             self.global_step += 1
             # t.set_description('Epoch %i' % epoch)
             # if self.print_time:

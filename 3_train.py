@@ -87,7 +87,11 @@ class BraTSTrainer(Trainer):
         # self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=1e-5,
         #                             momentum=0.99, nesterov=True)
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.0001)
-        
+
+        model_path = "/project/logs/segmamba/hf_agg_simp_ref_res_up/final_model_0.8998.pth"
+        self.best_mean_dice = 0.9195
+        self.load_state_dict(model_path)
+
         self.scheduler_type = None
         # self.cross = nn.CrossEntropyLoss()
         self.dice_loss = DiceCELoss(to_onehot_y=True, softmax=True)

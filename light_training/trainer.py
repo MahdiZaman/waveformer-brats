@@ -405,7 +405,7 @@ class Trainer:
             self.scheduler = PolyLRScheduler(self.optimizer, initial_lr=lr, max_steps=self.max_steps)
             print(f"scheduler_type is poly, warmup steps is {0}")
 
-        for epoch in range(0, self.max_epochs):
+        for epoch in range(499, self.max_epochs):
             self.epoch = epoch 
             if self.ddp:
                 torch.distributed.barrier()
@@ -503,7 +503,8 @@ class Trainer:
                 self.writer.add_scalar(k, scalar_value=v, global_step=step)
                 
     def load_state_dict(self, weight_path, strict=True):
-        sd = torch.load(weight_path, map_location="cpu")
+        sd_dict = torch.load(weight_path, map_location="cpu")
+        sd = sd_dict['model']
         if "module" in sd :
             sd = sd["module"]
         new_sd = {}
@@ -513,5 +514,7 @@ class Trainer:
             new_sd[new_k] = v 
 
         self.model.load_state_dict(new_sd, strict=strict)
+        sd_optim = sd_dict['optimizer']
+        self.optimizer.load_state_dict(sd_optim)
         
         print(f"model parameters are loaded successed.")

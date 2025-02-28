@@ -405,7 +405,7 @@ class Trainer:
             self.scheduler = PolyLRScheduler(self.optimizer, initial_lr=lr, max_steps=self.max_steps)
             print(f"scheduler_type is poly, warmup steps is {0}")
 
-        for epoch in range(0, self.max_epochs):
+        for epoch in range(471, self.max_epochs):
             self.epoch = epoch 
             if self.ddp:
                 torch.distributed.barrier()
@@ -437,7 +437,7 @@ class Trainer:
         # if self.local_rank == 0:
         # with tqdm(total=self.num_step_per_epoch, disable=(self.local_rank != 0)) as t:
         epoch_loss_values = []
-        for i in range(471, self.num_step_per_epoch):
+        for i in range(self.num_step_per_epoch):
             self.global_step += 1
             # t.set_description('Epoch %i' % epoch)
             # if self.print_time:

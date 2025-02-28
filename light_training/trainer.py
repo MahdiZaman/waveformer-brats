@@ -514,7 +514,7 @@ class Trainer:
             new_sd[new_k] = v 
 
         self.model.load_state_dict(new_sd, strict=strict)
-        sd_optim = sd_dict['optimizer']
-        self.optimizer.load_state_dict(sd_optim)
+        # sd_optim = sd_dict['optimizer']
+        # self.optimizer.load_state_dict(sd_optim)
         
         print(f"model parameters are loaded successed.")
